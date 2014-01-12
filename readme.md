@@ -6,7 +6,8 @@ The jar file that is given to Hadoop is produced by `mvn package`, which creates
 ## Sentence extraction
 
 The data processing happens in two steps. First, we parse the CSV file and extract individual sentences from the body
-and title fields using the OpenNLP sentence extractor. Unfortunately, this
+and title fields using the OpenNLP sentence extractor. This uses a custom input format based on the opencsv library.
+Unfortunately, this step
 cannot be done in parallel because CSV files with multi-line fields can't be split by Hadoop (or at least, I can't
 figure out a way).
 
