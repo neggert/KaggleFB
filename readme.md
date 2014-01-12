@@ -1,4 +1,5 @@
 Data processing using Hadoop and OpenNLP for a [facebook-sponsored Kaggle competition](http://www.kaggle.com/c/facebook-recruiting-iii-keyword-extraction).
+The basic idea is to extract tags from the text of StackOverflow questions
 
 The jar file that is given to Hadoop is produced by `mvn package`, which creates `target/KaggleFB-1.0-SNAPSHOT-job.jar`.
 
@@ -23,10 +24,10 @@ id  source  content tags
 
 where the fields are defined as
 
-* id - original post id, as defined in `Train.csv`
-* source - either `body` or `title` depending on whether the sentence came from a post body or title
-* content - the sentence
-* tags - the tags associated with the post this sentence came from
+* `id` - original post id, as defined in `Train.csv`
+* `source` - either `body` or `title` depending on whether the sentence came from a post body or title
+* `content` - the sentence
+* `tags` - the tags associated with the post this sentence came from
 
 ## Feature extraction
 
@@ -39,9 +40,13 @@ hadoop jar KaggleFB-1.0-SNAPSHOT-job.jar KaggleFB.FeatExtractMR KaggleFB/sent_ou
 This tokenizes the sentences into words using OpenNLP. It then extracts a set of features and a target for each word.
 The targets can be one of
 
-* NOTAG - the word is not part of a tag
-* TAGSTART - the word is the first word of a multi-word tag, or a single word tag
-* TAGMID - the word is part of a multi-word tag, but not the first word
+* `NOTAG (0)` - the word is not part of a tag
+* `TAGSTART(1)` - the word is the first word of a multi-word tag, or a single word tag
+* `TAGMID (2)` - the word is part of a multi-word tag, but not the first word
+
+Additionally, there is a special value for the previous target feature when looking at the first word of a sentence:
+
+* `START (3)`
 
 The features are subject to change as I work on this but they are currently:
 
@@ -54,7 +59,7 @@ The features are subject to change as I work on this but they are currently:
 The output file is in the format:
 
 ```
-tags    prevWord    nextWord    prevTarget  word    cap?    target
+source  tags    prevWord    nextWord    prevTarget  word    cap?    target
 ```
 
 The plan is to train a MaxEnt model using Mahout that will determine whether or not a given word is tag-like.
